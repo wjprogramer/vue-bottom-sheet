@@ -10,6 +10,13 @@ A nice clean and touch-friendly bottom sheet component based on [Vue.js](https:/
  - :clapper: [Demo](https://vaban-ru.github.io/vue-bottom-sheet-demo/)
  - :open_book: [Документация на русском](https://github.com/vaban-ru/vue-bottom-sheet/blob/master/README_RU.MD)
 
+## 筆記
+
+```
+npm install rimraf -g
+rimraf node_modules
+```
+
 ## Installation
 
 ### NPM

@@ -22,7 +22,10 @@
       ]"
         ref="bottomSheetCard"
     >
-      <div class="bottom-sheet__pan" ref="pan">
+      <div
+        class="bottom-sheet__pan"
+        ref="pan"
+      >
         <div class="bottom-sheet__bar"/>
       </div>
       <div
@@ -37,19 +40,20 @@
 </template>
 
 <script>
-import Hammer from "hammerjs";
+import Hammer from 'hammerjs'
+import { defineComponent } from 'vue'
 
-export default {
-  name: "VueBottomSheet",
-  data() {
-    const vm = this;
+export default defineComponent({
+  name: 'VueBottomSheet',
+  data () {
+    const vm = this
     return {
       inited: false,
       opened: false,
-      contentH: "auto",
+      contentH: 'auto',
       hammer: {
         pan: null,
-        content: null,
+        content: null
       },
       contentScroll: 0,
       cardP: null,
@@ -60,7 +64,7 @@ export default {
         mousedown: vm.clickOnBottomSheet,
         touchstart: vm.clickOnBottomSheet
       }
-    };
+    }
   },
   props: {
     overlay: {
@@ -69,11 +73,11 @@ export default {
     },
     maxWidth: {
       type: String,
-      default: "640px"
+      default: '640px'
     },
     maxHeight: {
       type: String,
-      default: "95%"
+      default: '95%'
     },
     clickToClose: {
       type: Boolean,
@@ -81,7 +85,7 @@ export default {
     },
     effect: {
       type: String,
-      default: "fx-default"
+      default: 'fx-default'
     },
     rounded: {
       type: Boolean,
@@ -97,7 +101,7 @@ export default {
     },
     overlayColor: {
       type: String,
-      default: "#0000004D"
+      default: '#0000004D'
     },
     backgroundScrollable: {
       type: Boolean,
@@ -109,110 +113,110 @@ export default {
     }
   },
   methods: {
-    isIphone() {
-      let iPhone = /iPhone/.test(navigator.userAgent) && !window.MSStream;
-      let aspect = window.screen.width / window.screen.height;
-      return iPhone && aspect.toFixed(3) === "0.462";
+    isIphone () {
+      let iPhone = /iPhone/.test(navigator.userAgent) && !window.MSStream
+      let aspect = window.screen.width / window.screen.height
+      return iPhone && aspect.toFixed(3) === '0.462'
     },
-    move(event, type) {
+    move (event, type) {
       if (this.swipeAble) {
-        let delta = -event.deltaY;
+        let delta = -event.deltaY
         if (
-            (type === 'content' && event.type === 'panup') ||
-            (type === 'content' && event.type === 'pandown' && this.contentScroll > 0)
+          (type === 'content' && event.type === 'panup') ||
+          (type === 'content' && event.type === 'pandown' && this.contentScroll > 0)
         ) {
-          this.$refs.bottomSheetCardContent.scrollTop = this.contentScroll + delta;
+          this.$refs.bottomSheetCardContent.scrollTop = this.contentScroll + delta
         } else if (event.type === 'panup' || event.type === 'pandown') {
-          this.moving = true;
+          this.moving = true
           if (event.deltaY > 0) {
-            this.cardP = delta;
+            this.cardP = delta
           }
         }
         if (event.isFinal) {
-          this.contentScroll = this.$refs.bottomSheetCardContent.scrollTop;
-          this.moving = false;
+          this.contentScroll = this.$refs.bottomSheetCardContent.scrollTop
+          this.moving = false
           if (this.cardP < -30) {
-            this.opened = false;
-            this.cardP = -this.cardH - this.stripe;
-            document.body.style.overflow = "";
-            this.$emit("closed");
+            this.opened = false
+            this.cardP = -this.cardH - this.stripe
+            document.body.style.overflow = ''
+            this.$emit('closed')
           } else {
-            this.cardP = 0;
+            this.cardP = 0
           }
         }
       }
     },
-    init() {
+    init () {
       return new Promise(resolve => {
-        this.contentH = "auto";
-        this.stripe = this.isIphone() ? 20 : 0;
-        this.cardH = this.$refs.bottomSheetCard.clientHeight;
-        this.contentH = `${this.cardH - this.$refs.pan.clientHeight}px`;
-        this.$refs.bottomSheetCard.style.maxHeight = this.maxHeight;
+        this.contentH = 'auto'
+        this.stripe = this.isIphone() ? 20 : 0
+        this.cardH = this.$refs.bottomSheetCard.clientHeight
+        this.contentH = `${this.cardH - this.$refs.pan.clientHeight}px`
+        this.$refs.bottomSheetCard.style.maxHeight = this.maxHeight
         this.cardP =
-            this.effect === "fx-slide-from-right" ||
-            this.effect === "fx-slide-from-left"
-                ? 0
-                : -this.cardH - this.stripe;
+          this.effect === 'fx-slide-from-right' ||
+          this.effect === 'fx-slide-from-left'
+            ? 0
+            : -this.cardH - this.stripe
         if (!this.inited) {
-          this.inited = true;
+          this.inited = true
           let options = {
             recognizers: [
-              [Hammer.Pan, {direction: Hammer.DIRECTION_VERTICAL}]
+              [Hammer.Pan, { direction: Hammer.DIRECTION_VERTICAL }]
             ]
           }
-          this.hammer.pan = new Hammer(this.$refs.pan, options);
-          this.hammer.pan.on("panstart panup pandown panend", e => {
+          this.hammer.pan = new Hammer(this.$refs.pan, options)
+          this.hammer.pan.on('panstart panup pandown panend', e => {
             this.move(e, 'pan')
           })
-          this.hammer.content = new Hammer(this.$refs.bottomSheetCardContent, options);
-          this.hammer.content.on("panstart panup pandown panend", e => {
+          this.hammer.content = new Hammer(this.$refs.bottomSheetCardContent, options)
+          this.hammer.content.on('panstart panup pandown panend', e => {
             this.move(e, 'content')
           })
         }
         setTimeout(() => {
-          resolve();
-        }, 10);
-      });
+          resolve()
+        }, 10)
+      })
     },
-    open() {
+    open () {
       this.init().then(() => {
-        this.opened = true;
-        this.cardP = 0;
+        this.opened = true
+        this.cardP = 0
 
         if (!this.$props.backgroundScrollable) {
-          document.body.style.overflow = "hidden";
+          document.body.style.overflow = 'hidden'
         }
-        
-        this.$emit("opened");
-      });
+
+        this.$emit('opened')
+      })
     },
-    close() {
-      this.opened = false;
+    close () {
+      this.opened = false
       this.cardP =
-          this.effect === "fx-slide-from-right" ||
-          this.effect === "fx-slide-from-left"
-              ? 0
-              : -this.cardH - this.stripe;
-      document.body.style.overflow = "";
-      this.$emit("closed");
+          this.effect === 'fx-slide-from-right' ||
+          this.effect === 'fx-slide-from-left'
+            ? 0
+            : -this.cardH - this.stripe
+      document.body.style.overflow = ''
+      this.$emit('closed')
     },
-    clickOnBottomSheet(event) {
+    clickOnBottomSheet (event) {
       if (this.clickToClose) {
         if (
-            event.target.classList.contains("bottom-sheet__backdrop") ||
-            event.target.classList.contains("bottom-sheet")
+          event.target.classList.contains('bottom-sheet__backdrop') ||
+          event.target.classList.contains('bottom-sheet')
         ) {
-          this.close();
+          this.close()
         }
       }
     }
   },
-  beforeDestroy() {
-    this.hammer?.pan?.destroy();
-    this.hammer?.content?.destroy();
+  beforeDestroy () {
+    // this.hammer?.pan?.destroy()
+    // this.hammer?.content?.destroy()
   }
-};
+})
 </script>
 
 <style lang="scss" scoped>
